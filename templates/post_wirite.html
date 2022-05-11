@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>post wirite</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"/>
+		<link rel="stylesheet" thref="../static/star-rating-svg.css">
+		<link rel="stylesheet" href="../static/post_wirite.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="../static/jquery.star-rating-svg.js"></script>
+  </head>
+  <body>
+    <div class="post_wirite">
+			<div>
+				<label for="story">식사는 어떠셨나요?</label>
+				<textarea id="story" class="input" name="story" rows="5" cols="33"></textarea>
+			</div>
+			<div class="my-rating"></div>
+			<div>
+				<div class="file is-boxed">
+					<label class="file-label">
+						<input class="file-input" type="file" name="resume">
+						<span class="file-cta">
+							<span class="file-label">
+								첨부파일 선택
+							</span>
+						</span>
+					</label>
+				</div>
+			</div>
+			<div>
+				<button onclick="postingSubmit()">작성완료 버튼</button>
+			</div>
+    </div>
+		<script>
+				const fileInput = $(".file input[type=file]");
+				let starRating = 0;
+				$(".my-rating").starRating({
+					totalStars: 5,
+					emptyColor: 'lightgray',
+					hoverColor: 'salmon',
+					activeColor: 'cornflowerblue',
+					initialRating: 4,
+					strokeWidth: 0,
+					useGradient: false,
+					useFullStars: true,
+					minRating: 1,
+					callback: function(currentRating, $el){
+						starRating = currentRating
+					}
+				});
+
+				/*  */
+				function postingSubmit() {
+					const txt = $('#story').val();
+					const file = $(".file input[type=file]")[0].files[0]
+					const form_data = new FormData();
+
+					form_data.append("comment", txt)
+					form_data.append("star", starRating)
+					form_data.append("file", file)
+	
+					$.ajax({
+						type: "POST",
+						url: "/api/posts",
+						data: form_data,
+						dataType: 'json',
+						cache: false,
+						contentType: false,
+						processData: false,
+						success: function (response) {
+								alert(response["msg"])
+								window.location.href = '/'
+						}
+					});
+				};
+				
+				/* 첨부파일 이름 변경 */
+				function postChange() {
+					const file = fileInput[0].files[0]
+					if (fileInput[0].files.length > 0) {
+						const fileName = $(".file .file-label .file-label");
+						fileName.text(fileInput[0].files[0].name);
+					}
+				};
+				
+				fileInput.on('change', postChange)
+		</script>
+	</body>
+</html>
