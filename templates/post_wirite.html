@@ -13,11 +13,15 @@
   <body>
     <div class="post_wirite">
 			<div>
-				<label for="story">식사는 어떠셨나요?</label>
+				<p>식사는 어떠셨나요? (필수)</p>
 				<textarea id="story" class="input" name="story" rows="5" cols="33"></textarea>
 			</div>
-			<div class="my-rating"></div>
 			<div>
+				<p>얼마나 맛있었나요? (필수)</p>
+				<div class="my-rating" data-rating="5"></div>
+			</div>
+			<div>
+				<p>사진도 보여주세요! (필수)</p>
 				<div class="file is-boxed">
 					<label class="file-label">
 						<input class="file-input" type="file" name="resume">
@@ -29,17 +33,19 @@
 					</label>
 				</div>
 			</div>
-			<div>
+			<div class="btn_inner">
 				<button onclick="postingSubmit()">작성완료 버튼</button>
 			</div>
     </div>
 		<script>
 				const fileInput = $(".file input[type=file]");
 				let starRating = 0;
+				
+				/* 별점 등록 */
 				$(".my-rating").starRating({
-					totalStars: 5,
-					emptyColor: 'lightgray',
-					hoverColor: 'salmon',
+					initialRating: 1,
+					starSize: 25,
+					hoverColor: '#2d2e34',
 					activeColor: 'cornflowerblue',
 					initialRating: 4,
 					strokeWidth: 0,
@@ -51,7 +57,7 @@
 					}
 				});
 
-				/*  */
+				/* 글 컨텐츠 전송 */
 				function postingSubmit() {
 					const txt = $('#story').val();
 					const file = $(".file input[type=file]")[0].files[0]
@@ -60,20 +66,31 @@
 					form_data.append("comment", txt)
 					form_data.append("star", starRating)
 					form_data.append("file", file)
-	
-					$.ajax({
-						type: "POST",
-						url: "/api/posts",
-						data: form_data,
-						dataType: 'json',
-						cache: false,
-						contentType: false,
-						processData: false,
-						success: function (response) {
-								alert(response["msg"])
-								window.location.href = '/'
-						}
-					});
+					
+					if(txt === ''){
+						alert('간단한 내용을 작성해주셔야 합니다.')
+						return
+					} else if(starRating === 0){
+						alert('별점을 한개라도 클릭해주셔야 합니다.')
+						return
+					} else if(fileInput[0].files.length === 0){
+						alert('이미지를 넣어주세요.')
+						return
+					} else {
+						$.ajax({
+							type: "POST",
+							url: "/api/posts",
+							data: form_data,
+							dataType: 'json',
+							cache: false,
+							contentType: false,
+							processData: false,
+							success: function (response) {
+									alert(response["msg"])
+									window.location.href = '/'
+							}
+						});
+					}
 				};
 				
 				/* 첨부파일 이름 변경 */
