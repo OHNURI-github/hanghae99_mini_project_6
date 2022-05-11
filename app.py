@@ -19,7 +19,8 @@ db = client.dbsparta
 @app.route('/login')
 def login():
     msg = request.args.get("msg")
-    return render_template('login.html', msg=msg)
+    return render_template('login_page.html', msg=msg)
+
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
@@ -35,7 +36,7 @@ def sign_in():
             'id': username_receive,
             'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
@@ -64,9 +65,9 @@ def sign_up():
     return jsonify({'result': 'success'})
 
 
-@app.route('/')
+@app.route('/main')
 def home():
-    return render_template('index.html')
+    return render_template('main.html')
 
 
 @app.route('/post_wirite')
