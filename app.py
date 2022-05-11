@@ -16,6 +16,10 @@ ca = certifi.where()
 client = MongoClient('mongodb+srv://test:sparta@cluster0.3rrj5.mongodb.net/Cluster0?retryWrites=true&w=majority', tlsCAFile=ca)
 db = client.dbsparta
 
+@app.route('/login')
+def login():
+    msg = request.args.get("msg")
+    return render_template('login.html', msg=msg)
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
@@ -37,6 +41,27 @@ def sign_in():
     # 찾지 못하면
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
+
+@app.route('/sign_up/check_dup', methods=['POST'])
+def check_dup():
+    # id중복확인
+    username_receive = request.form['username_give']
+    exists = bool(db.users.find_one({"username": username_receive}))
+    return jsonify({'result': 'success', 'exists': exists})
+
+
+@app.route('/sign_up/save', methods=['POST'])
+# 회원가입 서버
+def sign_up():
+    username_receive = request.form['username_give']
+    password_receive = request.form['password_give']
+    password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+    doc = {
+        "username": username_receive,  # 아이디
+        "password": password_hash,  # 비밀번호
+    }
+    db.users.insert_one(doc)
+    return jsonify({'result': 'success'})
 
 
 @app.route('/')
