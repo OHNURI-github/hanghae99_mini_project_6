@@ -106,4 +106,3 @@ dist
 #ETC
 venv
 .idea
-__pycache__
