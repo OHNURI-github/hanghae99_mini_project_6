@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='{{ url_for("static", filename="main_style.css") }}' rel="stylesheet">
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+
+    <title></title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Nanum+Brush+Script&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Gowun Batang', serif;
+        }
+
+        body {
+            padding: 30px 0 30px 0;
+            width: 100%;
+            height: 1000vh;
+            margin: 0 auto;
+            background-color: #DBD8D5;
+            min-height: 100vh;
+            padding-top: 3.25rem;
+        }
+
+        .mytitle {
+            width: 100%;
+            max-width: 100%;
+            height: 250px;
+            margin: 0px 0px auto 0px;
+
+
+            background-position: center;
+            background-size: cover;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+            background-color: #ffffff;
+            opacity: 0.5;
+
+            color: black;
+
+        }
+
+        .buttonline {
+            background-color: #ffffff;
+            opacity: 0.5;
+            width: 100%;
+            max-width: 100%;
+
+            flex-direction: row;
+        }
+
+        .showbtn {
+            margin-left: 50px;
+        }
+
+        .write {
+            float: right;
+            margin-right: 50px;
+        }
+
+        .btn-outline-dark {
+            float: right;
+            border-radius: 5px;
+            border-color: #f7a52d;
+            color: #f7a52d;
+
+
+        }
+
+
+    </style>
+    <script>
+
+
+
+
+
+
+    </script>
+</head>
+
+<body>
+<div class="background">
+    <section class="hero">
+        <div class="hero-body">
+            <p class="subtitle">나의 음식일기</p>
+        </div>
+    </section>
+    <nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}">
+                <strong class="is-sparta" style="font-family: 'Stylish', sans-serif;font-size: larger;"
+                        onclick=window.location.href="/login_page">식기喰記</strong>
+            </a>
+        </div>
+        <button type="button" class="btn btn-outline-dark" style="float: right" aria-label="logout"
+                onclick="sign_out()">
+            log out&nbsp;&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-sign-out"
+                                                                    aria-hidden="true"></i></span>
+        </button>
+    </nav>
+    <div class="buttonline">
+        <div class="btn-group btn-group-toggle showbtn" data-toggle="buttons">
+            <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> 모든 글 보기
+            </label>
+            <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2" autocomplete="off"> 내 글만 보기
+            </label>
+        </div>
+        <div class="write">
+            <button type="button" class="btn btn-outline-warning" onclick=window.location.href="/post_wirite">
+                글쓰기
+            </button>
+        </div>
+    </div>
+    <section class="section">
+        <div id="post-box" class="container">
+            <div class="box">
+                <article class="media">
+                    <div class="media-left">
+                        <a class="image is-64x64" href="#">
+                            <img class="is-rounded"
+                                 src={{ url_for("static", filename="profile_pics/profile_placeholder.png") }} alt="Image">
+                        </a>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>홍길동</strong> <small>@username</small> <small>10분 전</small>
+                                <br>
+                                글을 적는 칸
+                            </p>
+                        </div>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                                <a class="level-item is-sparta" aria-label="heart"
+                                   onclick="toggle_like('', 'heart')">
+                                  <span class="icon is-small"><i class="fa fa-heart"
+                                                                 aria-hidden="true"></i></span>&nbsp;<span
+                                        class="like-num">2.7k</span>
+                                </a>
+                            </div>
+
+                        </nav>
+                    </div>
+                </article>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+
+</body>
+
+</html>
