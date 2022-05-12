@@ -60,7 +60,6 @@
             margin-left: 50px;
         }
 
-
         .write {
             float: right;
             margin-right: 50px;
@@ -71,7 +70,7 @@
             max-height: 100px;
         }
 
-        .card{
+        .card {
 
             width: 95%;
             max-width: 500px;
@@ -84,13 +83,15 @@
 
 
     <script>
-
-
         function get_posts() {
+            if (username == undefined) {
+                username = ""
+            }
+
             $("#post-box").empty()
             $.ajax({
                 type: "GET",
-                url: "/api/posts",
+                url: `/api/posts?username_give=${username}`,
                 data: {},
                 success: function (response) {
                     if (response["result"] == "success") {
@@ -108,7 +109,7 @@
                                                      </div>
                                                  </div>
                                               </div>`
-                             $("#post-box").append(temp_html)
+                            $("#post-box").append(temp_html)
                         }
                     }
                 }
@@ -136,37 +137,42 @@
         <div class="hero-body">
             <img class="logo" src="{{ url_for('static', filename='logo_img.png') }}">
             <strong class="is-sparta" style="font-family: 'Stylish', sans-serif;font-size: larger;"></strong>
-            <button type="button" class="level-item button"  aria-label="logout" style="float: right; margin: 0px 25px 30px 0px; background-color: #958B82;"
-                onclick="log_out()">log out&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-sign-out" aria-hidden="true"></i></span>
+            <button type="button" class="level-item button" aria-label="logout"
+                    style="float: right; margin: 0px 25px 30px 0px; background-color: #958B82;"
+                    onclick="log_out()">log out&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-sign-out"
+                                                                                          aria-hidden="true"></i></span>
             </button>
             <h3>&nbsp;&nbsp;나의 음식일기</h3>
         </div>
     </section>
     <div class="buttonline">
         <div class="btn-group btn-group-toggle showbtn" data-toggle="buttons">
-            <label class="btn level-item button"style= "background-color: #958B82;" >
-                <input type="radio" name="options" id="option1"   autocomplete="off"  checked > 모든 글 보기
+            <label class="btn level-item button" style="background-color: #958B82;">
+                <input type="radio" name="options" id="option1" onclick=window.location.href="/main" autocomplete="off">
+                모든 글 보기
             </label>
-            <label class="btn level-item button"style= "background-color: #958B82;" >
-                <input type="radio" name="options"  id="option2"onclick=window.location.href="/main_mine" autocomplete="off"> 내 글만 보기
+            <label class="btn level-item button" style="background-color: #958B82;">
+                <input type="radio" name="options" id="option2" autocomplete="off" checked> 내 글만 보기
             </label>
         </div>
         <div class="write">
-            <button type="button" class="level-item button" style= "background-color: #958B82;" onclick=window.location.href="/post_wirite">
+            <button type="button" class="level-item button" style="background-color: #958B82;"
+                    onclick=window.location.href="/post_wirite">
                 &nbsp;&nbsp;글쓰기&nbsp;&nbsp;
             </button>
         </div>
     </div>
-
-  <div class="card" id="post-box">
-    <img class="card-img-top" src="..." alt="Card image cap">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-    </div>
-  </div >
-
+    {% if status %}
+        <div class="card" id="post-box">
+            <img class="card-img-top" src="..." alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional
+                    content. This content is a little bit longer.</p>
+                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            </div>
+        </div>
+    {% endif %}
 </div>
 
 </body>
