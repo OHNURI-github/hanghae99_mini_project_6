@@ -13,7 +13,7 @@ SECRET_KEY = 'SPARTA'
 
 ca = certifi.where()
 
-client = MongoClient('mongodb+srv://test:sparta@Cluster0.qlpwv.mongodb.net/Cluster0?retryWrites=true&w=majority')
+client = MongoClient('mongodb+srv://test:sparta@cluster0.3rrj5.mongodb.net/Cluster0?retryWrites=true&w=majority')
 db = client.dbsparta
 
 @app.route('/login')
@@ -82,8 +82,9 @@ def post_wirite():
 
 @app.route('/api/posts', methods=['GET'])
 def show_posts():
-    diaries = list(db.food.find({}, {'_id': False}))
-    return jsonify({'all_food': diaries})
+    diaries = list(db.food.find({}, {'_id': False}).sort("_id", -1).limit(20))
+    return jsonify({'all_food': diaries, "result": "success"})
+
 
 
 @app.route('/api/posts', methods=['POST'])
@@ -115,19 +116,6 @@ def save_posts():
         }
         db.food.insert_one(doc)  # DB에 저장합니다.
         return jsonify({'msg': '저장 완료!'})
-    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("home"))
-
-
-@app.route('/api/posts', methods=['GET'])
-def get_posts():
-    token_receive = request.cookies.get('mytoken')
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        posts = list(db.posts.find({}).sort("date", -1).limit(20))
-        for post in posts:
-            post["_id"] = str(post["_id"])
-        return jsonify({"result": "success","msg": "포스팅을 가져왔습니다.", "posts": posts})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
