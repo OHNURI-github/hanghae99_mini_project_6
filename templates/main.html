@@ -13,16 +13,13 @@
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
+
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-
-
-
-
 
 
     <title></title>
@@ -45,9 +42,11 @@
             padding-top: 3.25rem;
         }
 
-        .hero{
+        .hero {
             background-color: #DBD8D5;
+
         }
+
         .buttonline {
             background-color: #DBD8D5;
 
@@ -61,16 +60,20 @@
             margin-left: 50px;
         }
 
+
         .write {
             float: right;
             margin-right: 50px;
         }
 
-
-
-
+        .logo {
+            max-width: 180px;
+            max-height: 100px;
+        }
 
     </style>
+
+
     <script>
 
 
@@ -82,34 +85,27 @@
                 data: {},
                 success: function (response) {
                     if (response["result"] == "success") {
-                        let posts = response["posts"]
+                        let all_food = response["food"]
                         for (let i = 0; i < posts.length; i++) {
                             let post = posts[i]
-                            let time_post = new Date(post["date"])
-                            let html_temp = `<div class="box" id="${post["_id"]}">
+                            let time_post = new Date(all_food["date"])
+                            let star_image = '⭐'.repeat(star)
+                            let html_temp = `<div class="box" id="${all_food["_id"]}">
                                         <article class="media">
                                             <div class="media-left">
                                                 <a class="image is-64x64" href="/user/${post['username']}">
-                                                    <img class="is-rounded" src="/static/${post['profile_pic_real']}"
+                                                    <img class="is-rounded" src="/static/save_images${post['file']}"
                                                          alt="Image">
                                                 </a>
                                             </div>
                                             <div class="media-content">
                                                 <div class="content">
                                                     <p>
-                                                        <strong>${post['profile_name']}</strong> <small>@${post['username']}</small> <small>${time_post}</small>
+                                                        <strong>${post[star_image]}</strong> <small>@${post['username']}</small> <small>${time_post}</small>
                                                         <br>
                                                         ${post['comment']}
                                                     </p>
                                                 </div>
-                                                <nav class="level is-mobile">
-                                                    <div class="level-left">
-                                                        <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${post['_id']}', 'heart')">
-                                                            <span class="icon is-small"><i class="fa fa-heart"
-                                                                                           aria-hidden="true"></i></span>&nbsp;<span class="like-num">2.7k</span>
-                                                        </a>
-                                                    </div>
-                                                </nav>
                                             </div>
                                         </article>
                                     </div>`
@@ -119,6 +115,10 @@
                 }
             })
         }
+
+        $(document).ready(function () {
+            get_posts()
+        })
 
         function time2str(date) {
             let today = new Date()
@@ -138,10 +138,6 @@
             return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
         }
 
-        $(document).ready(function () {
-            get_posts()
-        })
-
 
         function log_out() {
             $.removeCookie('token', {path: '/'});
@@ -153,92 +149,91 @@
     </script>
 </head>
 
-<body>
-<div class="background">
+<body class="background">
+<div>
     <section class="hero">
         <div class="hero-body">
-            <p class="subtitle">나의 음식일기</p>
+            <img class="logo" src="{{ url_for('static', filename='logo_img.png') }}">
+            <strong class="is-sparta" style="font-family: 'Stylish', sans-serif;font-size: larger;"></strong>
+            <button type="button" class="level-item button"  aria-label="logout" style="float: right; margin: 0px 25px 30px 0px; background-color: #958B82;"
+                onclick="log_out()">log out&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-sign-out" aria-hidden="true"></i></span>
+            </button>
+            <h3>&nbsp;&nbsp;나의 음식일기</h3>
         </div>
     </section>
-    <nav class="navbar is-fixed-top is-white" style="background-color: #DBD8D5" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item" >
-                <img src="{{ url_for('static', filename='logo_img.png') }}">
-                <strong class="is-sparta" style="font-family: 'Stylish', sans-serif;font-size: larger;"
-                        ></strong>
-            </a>
-        </div>
-        <button type="button" class="btn btn-outline-dark" style="float: right" aria-label="logout"
-                onclick="log_out()">
-            log out&nbsp;<span class="icon is-small"><i class="fa fa-sign-out"
-                                                                    aria-hidden="true"></i></span>
-        </button>
-    </nav>
     <div class="buttonline">
         <div class="btn-group btn-group-toggle showbtn" data-toggle="buttons">
-            <label class="btn btn-secondary active">
-                <input type="radio" name="options" id="option1" autocomplete="off" checked> 모든 글 보기
+            <label class="btn level-item button"style= "background-color: #958B82;" >
+                <input type="radio" name="options" id="option1"onclick=""  autocomplete="off" checked > 모든 글 보기
             </label>
-            <label class="btn btn-secondary">
-                <input type="radio" name="options" id="option2" autocomplete="off"> 내 글만 보기
+            <label class="btn level-item button"style= "background-color: #958B82;" >
+                <input type="radio" name="options"  id="option2"onclick="" autocomplete="off"> 내 글만 보기
             </label>
         </div>
         <div class="write">
-            <button type="button" class="btn btn-outline-dark" onclick=window.location.href="/post_wirite">
-                글쓰기
+            <button type="button" class="level-item button" style= "background-color: #958B82;" onclick=window.location.href="/post_wirite">
+                &nbsp;&nbsp;글쓰기&nbsp;&nbsp;
             </button>
         </div>
     </div>
-    <section class="row row-cols-1 row-cols-md-4 g-4" id="post-box">
-        <div class="col">
-            <div class="card h-100">
-                <img src="https://movie-phinf.pstatic.net/20210728_221/1627440327667GyoYj_JPEG/movie_image.jpg"
-                     class="card-img-top">
-                <div class="card-body">
-                    <h5 class="card-title">영화 제목이 들어갑니다</h5>
-                    <p class="card-text">여기에 영화에 대한 설명이 들어갑니다.</p>
-                    <p>⭐⭐⭐</p>
-                    <p class="mycomment">나의 한줄 평을 씁니다</p>
-                </div>
+
+    <section class="section">
+        <div class="container" id="post-box">
+            <div class="box">
+                <article class="media">
+                    <div class="media-left">
+                        <a class="image is-64x64" href="#">
+                            <img class="is-rounded"
+                                 src={{ url_for("static", filename="save_images/logo_img.png") }} alt="Image">
+                        </a>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>홍길동</strong> <small>@username</small> <small>10분 전</small>
+                                <br>
+                                글을 적는 칸
+                            </p>
+                        </div>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                                <a class="level-item is-sparta" aria-label="heart"
+                                   onclick="toggle_like('', 'heart')">
+                                  <span class="icon is-small"><i class="fa fa-heart"
+                                                                 aria-hidden="true"></i></span>&nbsp;<span
+                                        class="like-num">2.7k</span>
+                                </a>
+                            </div>
+
+                        </nav>
+                    </div>
+                </article>
             </div>
+
         </div>
     </section>
 
+    <div class="box" id="">
+    <article class="media">
+        <div class="media-left">
+            <a class="image is-64x64" href="/user/${post['username']}">
+                <img class="is-rounded" src="/static/save_images${post['file']}"
+                     alt="Image">
+            </a>
+        </div>
+        <div class="media-content">
+            <div class="content">
+                <p>
+                    <strong>${post[star_image]}</strong> <small>@${post['username']}</small> <small>${time_post}</small>
+                    <br>
+                    ${post['comment']}
+                </p>
+            </div>
+        </div>
+    </article>
+</div>
+
+
 </body>
 </html>
-<section class="section">
-    <div class="container">
-        <div class="box">
-            <article class="media">
-                <div class="media-left">
-                    <a class="image is-64x64" href="#">
-                        <img class="is-rounded"
-                             src={{ url_for("static", filename="save_images/logo_img.png") }} alt="Image">
-                    </a>
-                </div>
-                <div class="media-content">
-                    <div class="content">
-                        <p>
-                            <strong>홍길동</strong> <small>@username</small> <small>10분 전</small>
-                            <br>
-                            글을 적는 칸
-                        </p>
-                    </div>
-                    <nav class="level is-mobile">
-                        <div class="level-left">
-                            <a class="level-item is-sparta" aria-label="heart"
-                               onclick="toggle_like('', 'heart')">
-                                  <span class="icon is-small"><i class="fa fa-heart"
-                                                                 aria-hidden="true"></i></span>&nbsp;<span
-                                    class="like-num">2.7k</span>
-                            </a>
-                        </div>
-
-                    </nav>
-                </div>
-            </article>
-        </div>
-
-    </div>
-</section>
 
