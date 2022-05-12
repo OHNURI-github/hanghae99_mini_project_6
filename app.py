@@ -13,8 +13,9 @@ SECRET_KEY = 'SPARTA'
 
 ca = certifi.where()
 
-client = MongoClient('mongodb+srv://test:sparta@cluster0.3rrj5.mongodb.net/Cluster0?retryWrites=true&w=majority', tlsCAFile=ca)
+client = MongoClient('mongodb+srv://test:sparta@Cluster0.qlpwv.mongodb.net/Cluster0?retryWrites=true&w=majority')
 db = client.dbsparta
+
 
 @app.route('/login')
 def login():
@@ -37,11 +38,11 @@ def sign_in():
             'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
+
 
 @app.route('/sign_up/check_dup', methods=['POST'])
 def check_dup():
@@ -68,6 +69,10 @@ def sign_up():
 @app.route('/main')
 def home():
     return render_template('main.html')
+
+@app.route('/')
+def front():
+    return render_template('login_page.html')
 
 
 @app.route('/post_wirite')
@@ -103,6 +108,21 @@ def save_posts():
     }
     db.food.insert_one(doc)  # DB에 저장합니다.
     return jsonify({'msg': '저장 완료!'})
+
+
+
+@app.route('/api/posts', methods=['GET'])
+def get_posts():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        posts = list(db.posts.find({}).sort("date", -1).limit(20))
+        for post in posts:
+            post["_id"] = str(post["_id"])
+        return jsonify({"result": "success","msg": "포스팅을 가져왔습니다.", "posts": posts})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
 
 
 if __name__ == '__main__':
