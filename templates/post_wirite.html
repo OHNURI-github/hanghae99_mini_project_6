@@ -11,13 +11,22 @@
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script src="../static/jquery.star-rating-svg.js"></script>
-		
+		<script>
+            function logo_click() {
+                let result = confirm('글쓰기를 중단 하시겠습니까?')
+                if (result == true) {
+                    location.replace('/main')
+                } else {
+
+                }
+            }
+        </script>
   </head>
   <body>
 		
     <div class="post_wirite">
 			<div class="logo_inner">
-				<img src="../static/logo_img.png" alt="">
+                <img src="../static/logo_img.png" alt="" onclick="logo_click()" style="cursor: pointer">
 			</div>
 			<div class="post_inner">
 				<div class="inner">
