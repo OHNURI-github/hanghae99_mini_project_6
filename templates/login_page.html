@@ -64,6 +64,7 @@
             } else {
                 $("#help-password-login").text("")
             }
+        }
 
             $.ajax({
                 type: "POST",
@@ -74,7 +75,7 @@
                 },
                 success: function (response) {
                     if (response['result'] == 'success') {
-                        $.cookie('mytoken', response['token'], {path: '/main'});
+                        $.cookie('mytoken', response['token'], {path: '/'});
                         window.location.replace("/main")
                     } else {
                         alert(response['msg'])

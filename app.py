@@ -16,7 +16,7 @@ ca = certifi.where()
 client = MongoClient('mongodb+srv://test:sparta@cluster0.3rrj5.mongodb.net/Cluster0?retryWrites=true&w=majority', tlsCAFile=ca)
 db = client.dbsparta
 
-@app.route('/login')
+@app.route('/')
 def login():
     msg = request.args.get("msg")
     return render_template('login_page.html', msg=msg)
@@ -36,12 +36,12 @@ def sign_in():
             'id': username_receive,
             'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
-
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
+
 
 @app.route('/sign_up/check_dup', methods=['POST'])
 def check_dup():
@@ -65,9 +65,13 @@ def sign_up():
     return jsonify({'result': 'success'})
 
 
-@app.route('/')
+@app.route('/main')
 def home():
-    return render_template('index.html')
+    return render_template('main.html')
+
+@app.route('/')
+def front():
+    return render_template('login_page.html')
 
 
 @app.route('/post_wirite')
@@ -77,32 +81,43 @@ def post_wirite():
 
 @app.route('/api/posts', methods=['GET'])
 def show_posts():
-    diaries = list(db.food.find({}, {'_id': False}))
-    return jsonify({'all_food': diaries})
+    diaries = list(db.food.find({}, {'_id': False}).sort("_id", -1).limit(20))
+    return jsonify({'all_food': diaries, "result": "success"})
+
 
 
 @app.route('/api/posts', methods=['POST'])
 def save_posts():
-    comment_receive = request.form['comment']
-    star_receive = request.form['star']
-    file = request.files["file"]
-    extension = file.filename.split('.')[-1]  # .점을 기준으로 파일 확장자명을 가져온다.
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+        print(user_info)
 
-    today = datetime.now()
-    mytime = today.strftime('%Y-%m-%d-%H-%M-%S')  # 날짜시간을 가져옴
-    filename = f'file-{mytime}'  # 날짜시간을 가져와서 파일명을 만들어준다.
+        comment_receive = request.form['comment']
+        star_receive = request.form['star']
+        file = request.files["file"]
+        extension = file.filename.split('.')[-1]  # .점을 기준으로 파일 확장자명을 가져온다.
 
-    save_to = f'static/save_images/{filename}.{extension}'  # 경로와, 저장할이름을 만들어 변수에 할당
-    file.save(save_to)  # 최종적으로 파일을 저장합니다.
-    doc = {
-        'id': today.strftime('%m%d%H%M%S'),
-        'comment': comment_receive,
-        'star': star_receive,
-        'file': f'{filename}.{extension}',  # 위에서 만든 파일명 추가합니다.
-        'time': today.strftime('%Y.%m.%d')
-    }
-    db.food.insert_one(doc)  # DB에 저장합니다.
-    return jsonify({'msg': '저장 완료!'})
+        today = datetime.now()
+        mytime = today.strftime('%Y-%m-%d-%H-%M-%S')  # 날짜시간을 가져옴
+        filename = f'file-{mytime}'  # 날짜시간을 가져와서 파일명을 만들어준다.
+
+        save_to = f'static/save_images/{filename}.{extension}'  # 경로와, 저장할이름을 만들어 변수에 할당
+        file.save(save_to)  # 최종적으로 파일을 저장합니다.
+        doc = {
+            'id': today.strftime('%m%d%H%M%S'),
+            'username': user_info["username"],
+            'comment': comment_receive,
+            'star': star_receive,
+            'file': f'{filename}.{extension}',  # 위에서 만든 파일명 추가합니다.
+            'time': today.strftime('%Y.%m.%d')
+        }
+        db.food.insert_one(doc)  # DB에 저장합니다.
+        return jsonify({'msg': '저장 완료!'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
 
 
 if __name__ == '__main__':
